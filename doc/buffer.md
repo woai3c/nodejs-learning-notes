@@ -1,7 +1,7 @@
 # Buffer 缓冲区
 Buffer 类是 JavaScript [Uint8Array](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) 类的子类，Node.js API 在支持 Buffer 的地方也接受普通的 Uint8Array。
 
-在计算机中，存储的数据用二进制表示。二进制数据的最小单位为 bit（比特)，每个 bit 的值为 0 或 1。8 个 bit 为一个字节。Buffer 用于存储二进制数据，并且提供了一系列方法对其进行增删改查等操作。
+在计算机中，存储的数据用二进制表示。二进制数据的最小单位为 bit（比特)，每个 bit 的值为 0 或 1，8 个 bit 为一个字节。Buffer 用于存储二进制数据，并且提供了一系列方法对其进行增删改查等操作。
 
 由于二进制数据都是 0 或 1，对于人来说，是很难阅读的。因此有了各种编码集，例如互联网最常用的 Unicode 编码。它在将数据存到计算机时先编码成 0/1 的格式再存储，需要读取时再对二进制数据进行转换，转成我们能够轻易理解的格式。
 
@@ -115,7 +115,7 @@ Buffer 是一个 JS 和 C++ 结合的模块，性能部分由 C++ 实现，非�
 
 ![](../img/1.png)
 
-Buffer 所占用的内存属于堆外内存，它在 node 进程启动时就已经加载了，并放在全局对象下。所以使用 Buffer 时，无须用 require() 加载，可直接使用。
+Buffer 所占用的内存属于堆外内存，它在 node 进程启动时就已经加载了，并放在全局对象下。所以使用 Buffer 时，无须用 `require()` 加载，可直接使用。
 
 Buffer 内存分配是在 node 的 C++ 层面实现内存申请的。即采用在 C++ 层面申请内存、在 JS 中分配内存的策略。
 
@@ -128,7 +128,7 @@ Buffer 内存分配是在 node 的 C++ 层面实现内存申请的。即采用�
 node 以 8KB 的界限来区分 Buffer 是大对象还是小对象。8KB 也就是每个 slab 的大小值，在 JS 层面，以它作为单位进行内存的分配。
 
 ### 分配小 Buffer 对象
-如果指定的 Buffer 对象大小小于 8KB，node 会按照小对象的方式分配内存。
+如果指定的 Buffer 对象小于 8KB，node 会按照小对象的方式分配内存。
 ```js
 var pool;
 function allocPool() {
@@ -226,7 +226,7 @@ Buffer.concat = function(list, length) {
         }
     }
 
-    var buffer = new Buffer(length);
+    var buffer = Buffer.alloc(length);
     var pos = 0;
     for (var i = 0; i < list.length; i++) {
         var buf = list[i];
