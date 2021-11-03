@@ -71,3 +71,32 @@ const stringDecoder = require('string_decoder').StringDecoder
 const decoder = new stringDecoder('utf-8')
 console.log(decoder.write(Buffer.from(['0xe4', '0xbd', '0xa0', '0xe5', '0xa5']))) // 你
 console.log(decoder.write(Buffer.from(['0xbd']))) // 好
+
+console.log(Buffer.__proto__) // [Function: Uint8Array]
+console.log(Buffer.__proto__.__proto__) // [Function: TypedArray]
+console.log(Buffer.__proto__.__proto__.__proto__) // [Function]
+
+// 创建一个8字节的 ArrayBuffer
+const ab = new ArrayBuffer(32);
+
+// 创建一个指向 ab 的 Int32 视图，开始于字节 0，个数为 2（一个 Int32Array 实例，长度为 4 字节，这里占了 8 字节）
+const v1 = new Int32Array(ab, 0, 2);
+v1[0] = 100 // 一个索引对应一个 32 位的有符号数
+v1[1] = 200
+
+// 创建一个指向 ab 的 Int8 视图，开始于字节 4，个数为 1
+const v2 = new Int8Array(ab, 8, 1);
+const v3 = new Int8Array(ab, 9, 1);
+v2[0] = 300 // 一个字节最多只能表示 256，所以赋值 300 溢出了，变成 44
+v3[0] = 400 // 同理，这里为 144，但为什么显示为 -112 呢？因为 144 的二进制为 '10010000'，而 Int8Array 是有符号的 8 位数，最高位为 -128，所以 -128 + 16 = -112
+
+// 创建一个指向 ab 的 Int16 视图，开始于字节 10，不带参数，则把剩下的缓冲区全占了
+const v4 = new Int16Array(ab, 10);
+v4[0] = 32767 // 一个索引对应一个 16 位的有符号数
+v4[1] = 32768
+
+console.log(ab)
+console.log(v1)
+console.log(v2)
+console.log(v3)
+console.log(v4)
