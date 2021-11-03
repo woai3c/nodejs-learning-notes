@@ -113,20 +113,20 @@ Buffer 是一个 JS 和 C++ 结合的模块，性能部分由 C++ 实现，非�
 
 ![](../img/1.png)
 
-Buffer 所占用的内存属于堆外内存，它在 node 进程启动时就已经加载了，并放在全局对象下。所以使用 Buffer 时，无须用 `require()` 加载，可直接使用。
+Buffer 所占用的内存属于堆外内存，它在 Node 进程启动时就已经加载了，并放在全局对象下。所以使用 Buffer 时，无须用 `require()` 加载，可直接使用。
 
-Buffer 内存分配是在 node 的 C++ 层面实现内存申请的。即采用在 C++ 层面申请内存、在 JS 中分配内存的策略。
+Buffer 内存分配是在 Node 的 C++ 层面实现内存申请的。即采用在 C++ 层面申请内存、在 JS 中分配内存的策略。
 
-为了高效地使用申请来的内存，node 采用了 slab 分配机制。它具有 3 种状态：
+为了高效地使用申请来的内存，Node 采用了 slab 分配机制。它具有 3 种状态：
 1. full: 完全分配状态。
 2. partial: 部分分配状态。
 3. empty: 未分配状态。
 
 
-node 以 8KB 的界限来区分 Buffer 是大对象还是小对象。8KB 也就是每个 slab 的大小值，在 JS 层面，以它作为单位进行内存的分配。
+Node 以 8KB 的界限来区分 Buffer 是大对象还是小对象。8KB 也就是每个 slab 的大小值，在 JS 层面，以它作为单位进行内存的分配。
 
 ### 分配小 Buffer 对象
-如果指定的 Buffer 对象小于 8KB，node 会按照小对象的方式分配内存。
+如果指定的 Buffer 对象小于 8KB，Node 会按照小对象的方式分配内存。
 ```js
 var pool;
 function allocPool() {
@@ -318,7 +318,7 @@ Int16Array(11) [
 * TypedArray 数组只是一层视图，本身不储存数据，它的数据都储存在底层的 ArrayBuffer 对象之中，要获取底层对象必须使用 buffer 属性。
 
 ### Buffer 和 TypedArray 的关系
-Nodejs 中的 Buffer 是 Uint8Array 的实现。
+Node 中的 Buffer 是 Uint8Array 的实现。
 ```js
 console.log(Buffer.__proto__) // [Function: Uint8Array]
 console.log(Buffer.__proto__.__proto__) // [Function: TypedArray]
