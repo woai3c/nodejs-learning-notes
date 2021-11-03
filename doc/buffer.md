@@ -1,6 +1,4 @@
 # Buffer 缓冲区
-Buffer 类是 JavaScript [Uint8Array](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) 类的子类，Node.js API 在支持 Buffer 的地方也接受普通的 Uint8Array。
-
 在计算机中，存储的数据用二进制表示。二进制数据的最小单位为 bit（比特)，每个 bit 的值为 0 或 1，8 个 bit 为一个字节。Buffer 用于存储二进制数据，并且提供了一系列方法对其进行增删改查等操作。
 
 由于二进制数据都是 0 或 1，对于人来说，是很难阅读的。因此有了各种编码集，例如互联网最常用的 Unicode 编码。它在将数据存到计算机时先编码成 0/1 的格式再存储，需要读取时再对二进制数据进行转换，转成我们能够轻易理解的格式。
@@ -252,8 +250,116 @@ http.createServer((req, res) => {
     res.send(buf)
 }
 ```
+
+## Buffer、ArrayBuffer、TypedArray、DataView 的区别
+ArrayBuffer 是用来存储二进制数据的，但是它不能直接操作数据，需要通过视图来操作。同一段内存，不同数据有不同的解读方式，这就叫做“视图”（view）。视图的作用是以指定格式解读二进制数据。
+TypedArray、DataView 就是两种不同的视图。前者的数组成员都是同一个数据类型，后者的数组成员可以是不同的数据类型。
+
+### TypedArray
+什么是“同一段内存，不同数据有不同的解读方式”呢？举个例子：
+```js
+// 创建一个8字节的 ArrayBuffer
+const ab = new ArrayBuffer(32);
+
+// 创建一个指向 ab 的 Int32 视图，开始于字节 0，长度为 2（一个 Int32Array 实例，长度为 4 字节，这里占了 8 字节）
+const v1 = new Int32Array(ab, 0, 2);
+v1[0] = 100 // 一个索引对应一个 32 位的有符号数
+v1[1] = 200
+
+// 创建一个指向 ab 的 Int8 视图，开始于字节 4，长度为 1
+const v2 = new Int8Array(ab, 8, 1);
+const v3 = new Int8Array(ab, 9, 1);
+v2[0] = 300 // 一个字节最多只能表示 256，所以赋值 300 溢出了，变成 44
+v3[0] = 400 // 同理，这里为 144，但为什么显示为 -112 呢？因为 144 的二进制为 '10010000'，而 Int8Array 是有符号的 8 位数，最高位为 -128，所以 -128 + 16 = -112
+
+// 创建一个指向 ab 的 Int16 视图，开始于字节 10，不带参数，则把剩下的缓冲区全占了
+const v4 = new Int16Array(ab, 10);
+v4[0] = 32767 // 一个索引对应一个 16 位的有符号数
+v4[1] = 32768
+
+console.log(ab)
+console.log(v1)
+console.log(v2)
+console.log(v3)
+console.log(v4)
+/*
+ArrayBuffer {
+  [Uint8Contents]: <64 00 00 00 c8 00 00 00 2c 90 ff 7f 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00>,
+  byteLength: 32
+}
+Int32Array(2) [ 100, 200 ]
+Int8Array(1) [ 44 ]
+Int8Array(1) [ -112 ]
+Int16Array(11) [
+  32767, -32768, 0,
+      0,      0, 0,
+      0,      0, 0,
+      0,      0
+]
+*/
+```
+从上面的代码可以看出，一段 32 字节的 ArrayBuffer 内存，可以分别被不同的视图进行解读（Int32Array、Int8Array、Int16Array）。
+
+目前，TypedArray 视图一共包括 9 种类型，每一种视图都是一种构造函数。
+* Int8Array：8 位有符号整数，长度 1 个字节。
+* Uint8Array：8 位无符号整数，长度 1 个字节。
+* Uint8ClampedArray：8 位无符号整数，长度 1 个字节，溢出处理不同。
+* Int16Array：16 位有符号整数，长度 2 个字节。
+* Uint16Array：16 位无符号整数，长度 2 个字节。
+* Int32Array：32 位有符号整数，长度 4 个字节。
+* Uint32Array：32 位无符号整数，长度 4 个字节。
+* Float32Array：32 位浮点数，长度 4 个字节。
+* Float64Array：64 位浮点数，长度 8 个字节。
+
+普通数组与 TypedArray 数组的差异主要在以下方面。
+* TypedArray 数组的所有成员，都是同一种类型。
+* TypedArray 数组的成员是连续的，不会有空位。
+* TypedArray 数组成员的默认值为 0。比如，new Array(10)返回一个普通数组，里面没有任何成员，只是 10 个空位；new Uint8Array(10)返回一个 TypedArray 数组，里面 10 个成员都是 0。
+* TypedArray 数组只是一层视图，本身不储存数据，它的数据都储存在底层的 ArrayBuffer 对象之中，要获取底层对象必须使用 buffer 属性。
+
+### Buffer 和 TypedArray 的关系
+Nodejs 中的 Buffer 是 Uint8Array 的实现。
+```js
+console.log(Buffer.__proto__) // [Function: Uint8Array]
+console.log(Buffer.__proto__.__proto__) // [Function: TypedArray]
+console.log(Buffer.__proto__.__proto__.__proto__) // [Function]
+```
+从上面的代码可以发现，Buffer 的原型是 Uint8Array，Uint8Array 的原型是 TypedArray。
+
+### DataView 和 TypedArray 的区别
+那么 DataView 又是什么视图呢？刚才说到，TypedArray 每一个类型的视图，它的值都是同类型的，而 DataView 可以用不同的数据格式来读一段内存。
+
+再详细点说，TypedArray 可以用不同的子类型分别解读一段 ArrayBuffer 中的某部分，并且这个 TypedArray 子类型数组都必须是同类型的值。
+而 DataView 不用事先用不同的子类型去解读一段 ArrayBuffer。它可以直接读取整段 ArrayBuffer，然后再用不同的格式去解读。
+```js
+const buffer = new ArrayBuffer(24);
+const dv = new DataView(buffer);
+
+// 从第 1 个字节读取一个 8 位无符号整数
+const v1 = dv.getUint8(0);
+
+// 从第 2 个字节读取一个 16 位无符号整数
+const v2 = dv.getUint16(1);
+
+// 从第 4 个字节读取一个 16 位无符号整数
+const v3 = dv.getUint16(3);
+```
+上面代码读取了 ArrayBuffer 对象的前 5 个字节，其中有一个 8 位整数和两个 16 位整数。
+
+DataView实例提供 8 个方法读取内存。
+* getInt8：读取 1 个字节，返回一个 8 位整数。
+* getUint8：读取 1 个字节，返回一个无符号的 8 位整数。
+* getInt16：读取 2 个字节，返回一个 16 位整数。
+* getUint16：读取 2 个字节，返回一个无符号的 16 位整数。
+* getInt32：读取 4 个字节，返回一个 32 位整数。
+* getUint32：读取 4 个字节，返回一个无符号的 32 位整数。
+* getFloat32：读取 4 个字节，返回一个 32 位浮点数。
+* getFloat64：读取 8 个字节，返回一个 64 位浮点数。
+
+这一系列get方法的参数都是一个字节序号（不能是负数，否则会报错），表示从哪个字节开始读取。
 ## 参考资料
 * [深入浅出Node.js](https://book.douban.com/subject/25768396/)
 * [Node.js Buffer(缓冲区)](https://www.runoob.com/nodejs/nodejs-buffer.html)
 * [Node.js Buffer](http://nodejs.cn/learn/nodejs-buffers)
 * [buffer](http://nodejs.cn/api/buffer.html)
+* [ArrayBuffer](https://es6.ruanyifeng.com/#docs/arraybuffer)
