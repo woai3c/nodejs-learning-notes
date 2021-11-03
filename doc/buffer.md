@@ -9,7 +9,7 @@
 const buf = Buffer.from('abcdefghijklmnopqrstuvwxyz')
 const n = buf[1]
 
-// buffer 中的每个数字代表一个字节，Unicode 编码。
+// buffer 中的每个数字代表一个字节。
 // 16 进制的数字
 console.log(typeof buf, buf) // object <Buffer 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70 71 72 73 74 75 76 77 78 79 7a>
 
