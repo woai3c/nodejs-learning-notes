@@ -147,9 +147,9 @@ Node.js 中有四种基本的流类型：
 ### 缓冲
 Writable 和 Readable 流都将数据存储在内部缓冲区中。
 
-可能缓冲的数据量取决于传给流的构造函数的 highWaterMark 选项。 对于普通的流，highWaterMark 选项指定字节的总数。 对于在对象模式下操作的流，highWaterMark 指定对象的总数。
+可能缓冲的数据量取决于传给流的构造函数的 highWaterMark 选项。 对于普通的流，highWaterMark 选项指定字节的总数。
 
-当实现调用 stream.push(chunk) 时，数据缓存在 Readable 流中。 如果流的消费者没有调用 `stream.read()`，则数据会一直驻留在内部队列中，直到被消费。
+当实现调用 `stream.push(chunk)` 时，数据缓存在 Readable 流中。 如果流的消费者没有调用 `stream.read()`，则数据会一直驻留在内部队列中，直到被消费。
 
 一旦内部读取缓冲区的总大小达到 highWaterMark 指定的阈值，则流将暂时停止从底层资源读取数据，直到可以消费当前缓冲的数据（也就是，流将停止调用内部的用于填充读取缓冲区 `readable._read()` 方法）。
 
@@ -160,8 +160,6 @@ stream API 的一个关键目标，尤其是 `stream.pipe()` 方法，是将数�
 highWaterMark 选项是阈值，而不是限制：它规定了流在停止请求更多数据之前缓冲的数据量。 它通常不强制执行严格的内存限制。 特定的流实现可能会选择实施更严格的限制，但这样做是可选的。
 
 由于 Duplex 和 Transform 流都是 Readable 和 Writable，因此每个流都维护两个独立的内部缓冲区，用于读取和写入，允许每一端独立操作，同时保持适当且高效的数据流。 例如，net.Socket 实例是 Duplex 流，其 Readable 端允许消费从套接字接收的数据，其 Writable 端允许将数据写入套接字。 因为数据可能以比接收数据更快或更慢的速度写入套接字，所以每一端都应该独立于另一端进行操作（和缓冲）。
-
-内部缓冲的机制是内部的实现细节，可能随时更改。但是，对于某些高级实现，可以使用 writable.writableBuffer 或 readable.readableBuffer 检索内部的缓冲区。不鼓励使用这些未记录的属性。
 ### Readable
 可读流是对被消费的数据的来源的抽象。
 
