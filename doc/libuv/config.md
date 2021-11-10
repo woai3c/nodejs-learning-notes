@@ -1,3 +1,4 @@
+# libuv 环境配置
 ## 构建项目
 ### 克隆
 ```bash
@@ -94,8 +95,7 @@ tasks.json
 #include <stdlib.h>
 #include <uv.h>
 
-int main()
-{
+int main() {
     uv_loop_t *loop = malloc(sizeof(uv_loop_t));
     uv_loop_init(loop);
     
@@ -107,10 +107,13 @@ int main()
     return 0;
 }
 ```
-然后在文件下按下 F5，即可开始调试。
+然后在该文件按下 F5，即可开始调试。
 
 ![image](https://user-images.githubusercontent.com/22117876/141145126-49e51703-0529-452c-adc7-cc37811429b3.png)
 
 对着你想打断点的函数用 `CTRL + 左击或 Command + 左击` 跳转到对应的函数，再加断点。
 
 ![image](https://user-images.githubusercontent.com/22117876/141145459-5d700e7e-ac46-4c64-8aba-6f3f0314e07b.png)
+
+## 参考资料
+* [vscode 调试](https://www.jianshu.com/p/4e06d5d3bca3)
