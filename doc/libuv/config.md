@@ -1,9 +1,9 @@
 ## 构建项目
-#### 克隆
+### 克隆
 ```bash
 git clone https://github.com/libuv/libuv.git
 ```
-#### 构建
+### 构建
 ```bash
 sh autogen.sh
 ./configure
@@ -12,7 +12,7 @@ make install
 ```
 
 ## 使用
-#### `Undefined symbols for architecture x86_64` 报错
+### `Undefined symbols for architecture x86_64` 报错
 编译的时候带上 `-luv` 参数：
 ```bash
 gcc main.cpp -luv
@@ -38,9 +38,6 @@ gcc main.cpp -luv
 launch.json
 ```json
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
@@ -91,3 +88,29 @@ tasks.json
     "version": "2.0.0"
 }
 ```
+配置完成后，在 libuv 目录下创建个 c 文件测试一下:
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <uv.h>
+
+int main()
+{
+    uv_loop_t *loop = malloc(sizeof(uv_loop_t));
+    uv_loop_init(loop);
+    
+    printf("suc\n");
+    uv_run(loop, UV_RUN_DEFAULT);
+
+    uv_loop_close(loop);
+    free(loop);
+    return 0;
+}
+```
+然后在文件下按下 F5，即可开始调试。
+
+![image](https://user-images.githubusercontent.com/22117876/141145126-49e51703-0529-452c-adc7-cc37811429b3.png)
+
+对着你想打断点的函数用 `CTRL + 左击或 Command + 左击` 跳转到对应的函数，再加断点。
+
+![image](https://user-images.githubusercontent.com/22117876/141145459-5d700e7e-ac46-4c64-8aba-6f3f0314e07b.png)
