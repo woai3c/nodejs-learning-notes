@@ -11,7 +11,7 @@ make -j4
 make install
 ```
 
-## 使用
+## 踩坑
 ### `Undefined symbols for architecture x86_64` 报错
 编译的时候带上 `-luv` 参数：
 ```bash
