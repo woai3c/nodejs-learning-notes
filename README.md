@@ -4,4 +4,4 @@
 * [EventLoop 事件循环](https://github.com/woai3c/nodejs-learning-notes/blob/main/doc/eventLoop.md)
 
 ## libuv
-* [libuv 项目调试环境配置](https://github.com/woai3c/nodejs-learning-notes/blob/main/doc/libuv/config.md)
+* [libuv 调试环境配置](https://github.com/woai3c/nodejs-learning-notes/blob/main/doc/libuv/config.md)
