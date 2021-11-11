@@ -115,5 +115,15 @@ int main() {
 
 ![image](https://user-images.githubusercontent.com/22117876/141145459-5d700e7e-ac46-4c64-8aba-6f3f0314e07b.png)
 
+## 使用 Code Runner 执行代码
+由于执行依赖 libuv 的代码得加上 `-luv` 参数，但 Code Runner 默认参数只有 `-o`，执行时会报错。所以需要在项目的 `.vscode` 文件夹下创建 `settings.json` 文件，添加以下代码：
+```json
+{
+    "code-runner.executorMap": {
+        "c": "cd $dir && gcc $fileName -luv -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+    }
+}
+```
+现在就可以点击 VSCode 右上角的 Code Runner 按钮（一个向右的空心三角形）直接执行代码了。
 ## 参考资料
 * [vscode 调试](https://www.jianshu.com/p/4e06d5d3bca3)
