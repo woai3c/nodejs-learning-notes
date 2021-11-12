@@ -5,3 +5,4 @@
 
 ## libuv
 * [libuv 调试环境配置](https://github.com/woai3c/nodejs-learning-notes/blob/main/doc/libuv/config.md)
+* [计算机术语](https://github.com/woai3c/nodejs-learning-notes/blob/main/doc/libuv/computerTerms.md)
