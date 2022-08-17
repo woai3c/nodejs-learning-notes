@@ -147,7 +147,7 @@ Node.js 中有四种基本的流类型：
 ### 缓冲
 Writable 和 Readable 流都将数据存储在内部缓冲区中。
 
-可能缓冲的数据量取决于传给流的构造函数的 highWaterMark 选项。 对于普通的流，highWaterMark 选项指定字节的总数。
+允许缓冲的数据量取决于传给流的构造函数的 highWaterMark 选项。 对于普通的流，highWaterMark 选项指定字节的总数。
 
 当实现调用 `stream.push(chunk)` 时，数据缓存在 Readable 流中。 如果流的消费者没有调用 `stream.read()`，则数据会一直驻留在内部队列中，直到被消费。
 
